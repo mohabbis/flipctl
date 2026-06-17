@@ -9,6 +9,26 @@ On one side, FlipCTL interacts with the operating system and wrappers around com
 > [!NOTE]
 > We are looking for a Software Architect to join the FlipCTL project. Learn more [here](#how-to-contribute).
 
+## Architecture
+
+![](files/pics/flipctl-architecture.jpg)
+
+Core Components of FlipCTL:
+
+* **Backend** is responsible for managing the operating system itself. It can interact with systemd, control OS services, configure networking through NetworkManager or systemd-networkd, and wrap existing command-line utilities such as nmap, ping, and traceroute. The backend exposes these capabilities through APIs that are consumed by the frontend.
+
+* **Frontend UI** is currently built using HTML and JavaScript. Despite the associated overhead, this approach enables rapid UI development and compact implementation, while avoiding the need for specialized expertise required by many embedded UI frameworks.
+
+* **Renderer** is a web browser. On Flipper One, we currently use a headless WebKit instance running directly on top of DRM (Direct Rendering Manager), without Xorg or Wayland. We also want to support multiple renderer options, for example, for a TUI (Text User Interface) for using  directly from the console.
+
+* **App Wrappers** integrate standard Linux command line applications into FlipCTL, providing controls for managing them and displaying their output.
+
+* **Control Interfaces** are the devices and applications used to control FlipCTL:
+    * Flipper One.
+    * FlipCTL Control Panel.
+    * TUI (Text UI) via a local terminal or SSH.
+    * Web browser or desktop application.
+
 ## FlipCTL Control Panel
 
 FlipCTL Control Panel is a compact device featuring the same display as the Flipper One, along with physical buttons and a couple of LEDs. It provides full control over FlipCTL and can also emulate Power and Reset button presses on the host system using built-in relays.
@@ -39,26 +59,6 @@ FlipCTL Control Panel supports two host interfaces for communication with and po
 ![](files/pics/flipctl-back-side.png)
 
 FlipCTL also features a 2.54 mm pitch header (not shown on the image above) for connecting to the host motherboard's front panel connector, usually labeled F_PANEL. This enables local or remote control of the host's power and reset functions through FlipCTL.
-
-## Architecture
-
-![](files/pics/flipctl-architecture.jpg)
-
-Core Components of FlipCTL:
-
-* **Backend** is responsible for managing the operating system itself. It can interact with systemd, control OS services, configure networking through NetworkManager or systemd-networkd, and wrap existing command-line utilities such as nmap, ping, and traceroute. The backend exposes these capabilities through APIs that are consumed by the frontend.
-
-* **Frontend UI** is currently built using HTML and JavaScript. Despite the associated overhead, this approach enables rapid UI development and compact implementation, while avoiding the need for specialized expertise required by many embedded UI frameworks.
-
-* **Renderer** is a web browser. On Flipper One, we currently use a headless WebKit instance running directly on top of DRM (Direct Rendering Manager), without Xorg or Wayland. We also want to support multiple renderer options, for example, for a TUI (Text User Interface) for using  directly from the console.
-
-* **App Wrappers** integrate standard Linux command line applications into FlipCTL, providing controls for managing them and displaying their output.
-
-* **Control Interfaces** are the devices and applications used to control FlipCTL:
-    * Flipper One.
-    * FlipCTL Control Panel.
-    * TUI (Text UI) via a local terminal or SSH.
-    * Web browser or desktop application.
 
 ## How to contribute
 
