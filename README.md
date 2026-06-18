@@ -17,9 +17,9 @@ Core Components of FlipCTL:
 
 * **Backend** is responsible for managing the operating system itself. It can interact with systemd, control OS services, configure networking through NetworkManager or systemd-networkd, and wrap existing command-line utilities such as nmap, ping, and traceroute. The backend exposes these capabilities through APIs that are consumed by the frontend.
 
-* **Frontend UI** is currently built using HTML and JavaScript. Despite the associated overhead, this approach enables rapid UI development and compact implementation, while avoiding the need for specialized expertise required by many embedded UI frameworks.
+* **UI Frontend** is currently built using HTML and JavaScript. Despite the associated overhead, this approach enables rapid UI development and compact implementation, while avoiding the need for specialized expertise required by many embedded UI frameworks.
 
-* **Renderer** is a web browser. On Flipper One, we currently use a headless WebKit instance running directly on top of DRM (Direct Rendering Manager), without Xorg or Wayland. We also want to support multiple renderer options, for example, for a TUI (Text User Interface) for using  directly from the console.
+* **Renderer** is a web browser. On Flipper One, we currently use a headless WebKit instance running directly on top of DRM (Direct Rendering Manager), without Xorg or Wayland. We also want to support multiple renderer options, for example, TUI (Text User Interface) for using  directly from the console.
 
 * **App Wrappers** integrate standard Linux command line applications into FlipCTL, providing controls for managing them and displaying their output.
 
