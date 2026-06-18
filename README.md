@@ -76,3 +76,4 @@ A Pull Request should include:
 
 * [FlipCTL page](https://docs.flipper.net/one/cpu-software/flipctl) on the Flipper One Dev Portal.
 * [Blog post](https://blog.flipper.net/) about FlipCTL in the Flipper Devices blog.
+* [Fake FLipCTL2](https://github.com/flipperdevices/flipperone-testing/tree/dev/fake-flipctl2) current dirty AI-made prototype of FlipCTL, needs complete rework
