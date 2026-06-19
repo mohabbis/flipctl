@@ -54,7 +54,7 @@ FlipCTL Control Panel supports two host interfaces for communication with and po
 * **SPI** via the 40-pin header on the back of the device. Designed for direct connection to single-board computers (SBCs). 
 
 > [!NOTE]
-> The choice of SPI is not final yet. We are discussing it in [this issue]().
+> The choice of SPI is not final yet. We are discussing it in [this issue](https://github.com/flipperdevices/flipperone-hardware/issues/133).
 
 ![](files/pics/flipctl-back-side.png)
 
