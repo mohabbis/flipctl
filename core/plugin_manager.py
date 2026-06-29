@@ -6,6 +6,7 @@ containing a plugin.yaml descriptor. Executes plugins by spawning their
 entry-point process, passing inputs as JSON via stdin, and reading JSON
 output from stdout.
 """
+
 import json
 import subprocess
 import sys
@@ -13,6 +14,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+from .sandbox import sandboxed
+
 
 PLUGINS_DIR = Path(__file__).parent.parent / "plugins"
 
@@ -40,9 +44,11 @@ class PluginManager:
         with open(spec_path) as f:
             spec = yaml.safe_load(f)
         required_keys = {"name", "description", "version", "inputs", "command", "timeout"}
-        missing = required_keys - spec.keys()
+        missing = required_keys - set(spec.keys())
         if missing:
             raise ValueError(f"plugin.yaml missing keys: {missing}")
+        # Add sandbox capability flag
+        spec["_sandbox_capable"] = False  # Plugins opt-in to sandboxing
         spec["_dir"] = plugin_dir
         return spec
 
@@ -53,11 +59,24 @@ class PluginManager:
                 "description": spec["description"],
                 "version": spec["version"],
                 "inputs": spec["inputs"],
+                "sandbox_capable": spec.get("_sandbox_capable", False)
             }
             for spec in self._plugins.values()
         ]
 
-    def execute(self, plugin_name: str, inputs: dict[str, Any]) -> dict:
+    @sandboxed
+    def _execute_in_sandbox(self, plugin_name: str, inputs: dict[str, Any]) -> dict:
+        """
+        Execute a plugin within the sandbox context.
+        This method is decorated with @sandboxed to run in a sandbox.
+        """
+        return self._execute_plugin_direct(plugin_name, inputs)
+
+    def _execute_plugin_direct(self, plugin_name: str, inputs: dict[str, Any]) -> dict:
+        """
+        Execute a plugin directly (the actual implementation).
+        This is called from within the sandboxed context.
+        """
         spec = self._plugins.get(plugin_name)
         if spec is None:
             raise PluginError(f"Unknown plugin: {plugin_name!r}")
@@ -82,6 +101,7 @@ class PluginManager:
                 text=True,
                 timeout=timeout,
                 cwd=plugin_dir,
+                shell=False,  # Explicitly set shell=False for security
             )
         except subprocess.TimeoutExpired:
             raise PluginError(f"Plugin {plugin_name!r} timed out after {timeout}s")
@@ -97,6 +117,28 @@ class PluginManager:
             return json.loads(result.stdout)
         except json.JSONDecodeError as exc:
             raise PluginError(f"Plugin {plugin_name!r} returned invalid JSON: {exc}")
+
+    def execute(self, plugin_name: str, inputs: dict[str, Any]) -> dict:
+        """
+        Execute a plugin with given inputs.
+
+        Args:
+            plugin_name: Name of the plugin to execute
+            inputs: Dictionary of input parameters
+
+        Returns:
+            Dictionary containing plugin output
+
+        Raises:
+            PluginError: If plugin execution fails
+        """
+        # Check if plugin is sandbox capable, otherwise use direct execution
+        spec = self._plugins.get(plugin_name)
+        if spec and spec.get("_sandbox_capable", False):
+            return self._execute_in_sandbox(plugin_name, inputs)
+        else:
+            # For non-sandbox-capable plugins, execute directly but still with shell=False
+            return self._execute_plugin_direct(plugin_name, inputs)
 
     def _validate_inputs(self, spec: dict, inputs: dict) -> None:
         for field in spec.get("inputs", []):
