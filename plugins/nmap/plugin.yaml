@@ -1,0 +1,15 @@
+name: nmap
+description: Fast port scan of a target host using nmap. Returns a list of open ports with service names.
+version: "1.0"
+inputs:
+  - name: target
+    type: string
+    required: true
+    description: IP address or hostname to scan
+  - name: flags
+    type: string
+    required: false
+    default: "-F"
+    description: nmap flags (default -F for fast scan)
+command: python main.py
+timeout: 60
